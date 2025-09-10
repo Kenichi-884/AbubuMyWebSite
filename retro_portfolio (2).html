@@ -1,0 +1,1862 @@
+    <script>
+        // Enhanced JavaScript with modern conveniences
+        var videoSources = [
+            "video/FantasyConnectMove.mp4",
+            "video/ファンタジーコネクトTL.mp4"
+        ];
+        var currentVideoIndex = 0;
+        var bgmEnabled = false;
+        var counterValue = 1337;
+        var onlineUsers = 3;
+        var currentTheme = 'classic';
+        var panelOpen = false;
+
+        // Search functionality
+        var searchableItems = [
+            {name: 'FantasyConnect', section: 'games', description: '3Dアクションゲーム Unity'},
+            {name: 'Monster Hunters', section: 'games', description: 'オンラインマルチプレイ'},
+            {name: '必笑～笑いのツボ職人～', section: 'games', description: 'クリックゲーム GameJam'},
+            {name: 'さんぶたレーシング', section: 'games', description: 'レーシングゲーム チーム開発'},
+            {name: '居残授業', section: 'games', description: 'OpenGL C++'},
+            {name: 'ファンタジーコネクト2', section: 'games', description: '開発中 続編'},
+            {name: '善通寺メタバース', section: 'metaverse', description: 'メタバース 地域連携'},
+            {name: 'NeonCity2024', section: 'vrchat', description: 'VRChat ワールド'},
+            {name: 'City of Dreams', section: 'cluster', description: 'Cluster 夢の街'},
+            {name: 'Tokyo', section: 'cluster', description: 'Cluster 東京'},
+            {name: '桜咲く街', section: 'cluster', description: 'Cluster 和風'},
+            {name: 'Horror', section: 'cluster', description: 'Cluster ホラー'}
+        ];
+
+        // Initialize enhanced features
+        function initEnhancedFeatures() {
+            updateCounters();
+            updateOnlineUsers();
+            updateWeather();
+            initMatrixRain();
+            updateStats();
+            startLiveUpdates();
+        }
+
+        // Panel toggle
+        function togglePanel() {
+            var content = document.getElementById('convenienceContent');
+            var button = document.querySelector('.panel-toggle');
+            panelOpen = !panelOpen;
+            
+            if (panelOpen) {
+                content.classList.add('active');
+                button.textContent = '便利機能 ▲';
+            } else {
+                content.classList.remove('active');
+                button.textContent = '便利機能 ▼';
+            }
+        }
+
+        // Search functionality
+        function performSearch() {
+            var query = document.getElementById('searchBox').value.toLowerCase();
+            var results = document.getElementById('searchResults');
+            
+            if (query.length < 2) {
+                results.style.display = 'none';
+                return;
+            }
+            
+            var matches = searchableItems.filter(item => 
+                item.name.toLowerCase().includes(query) || 
+                item.description.toLowerCase().includes(query)
+            );
+            
+            if (matches.length > 0) {
+                results.innerHTML = matches.map(item => 
+                    `<div class="search-result-item" onclick="smoothScrollAndHighlight('${item.section}')">
+                        ${item.name} - ${item.description}
+                     </div>`
+                ).join('');
+                results.style.display = 'block';
+            } else {
+                results.innerHTML = '<div class="search-result-item">見つかりませんでした</div>';
+                results.style.display = 'block';
+            }
+        }
+
+        // Enhanced scroll with highlight
+        function smoothScrollAndHighlight(target) {
+            smoothScroll(target);
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('searchBox').value = '';
+            
+            // Highlight target section
+            setTimeout(function() {
+                var element = document.getElementById(target);
+                if (element) {
+                    element.style.boxShadow = '0 0 20px #66ccff';
+                    setTimeout(function() {
+                        element.style.boxShadow = '';
+                    }, 2000);
+                }
+            }, 500);
+        }
+
+        // Theme switcher
+        function setTheme(theme) {
+            currentTheme = theme;
+            var themeButtons = document.querySelectorAll('.theme-option');
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            var body = document.body;
+            var matrixRain = document.getElementById('matrixRain');
+            
+            // Reset all theme classes
+            body.className = '';
+            matrixRain.style.display = 'none';
+            
+            switch(theme) {
+                case 'matrix':
+                    body.style.background = 'linear-gradient(45deg, #000011 0%, #001100 50%, #000011 100%)';
+                    matrixRain.style.display = 'block';
+                    startMatrixRain();
+                    break;
+                case 'neon':
+                    body.style.background = 'linear-gradient(45deg, #110022 0%, #220033 50%, #110022 100%)';
+                    break;
+                default:
+                    body.style.background = 'linear-gradient(45deg, #001122 0%, #003366 50%, #001122 100%)';
+            }
+            
+            localStorage.setItem('abubu_theme', theme);
+        }
+
+        // Matrix rain effect
+        function initMatrixRain() {
+            if (localStorage.getItem('abubu_theme') === 'matrix') {
+                setTheme('matrix');
+            }
+        }
+
+        function startMatrixRain() {
+            var matrixContainer = document.getElementById('matrixRain');
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789アイウエオカキクケコ';
+            
+            setInterval(function() {
+                if (currentTheme === 'matrix' && document.querySelectorAll('.matrix-char').length < 100) {
+                    var char = document.createElement('div');
+                    char.className = 'matrix-char';
+                    char.innerHTML = chars[Math.floor(Math.random() * chars.length)];
+                    char.style.left = Math.random() * 100 + '%';
+                    char.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                    matrixContainer.appendChild(char);
+                    
+                    setTimeout(function() {
+                        if (char.parentNode) {
+                            char.parentNode.removeChild(char);
+                        }
+                    }, 3000);
+                }
+            }, 100);
+        }
+
+        // Enhanced counter with animations
+        function updateCounters() {
+            setInterval(function() {
+                counterValue += Math.floor(Math.random() * 5) + 1;
+                document.getElementById('counterDigits').textContent = String(counterValue).padStart(6, '0');
+                
+                // Update daily counters
+                var today = parseInt(document.getElementById('todayCounter').textContent);
+                var yesterday = parseInt(document.getElementById('yesterdayCounter').textContent);
+                
+                if (Math.random() < 0.3) {
+                    document.getElementById('todayCounter').textContent = today + 1;
+                }
+                
+                checkSpecialCounter();
+            }, 8000);
+        }
+
+        // Online users simulation
+        function updateOnlineUsers() {
+            setInterval(function() {
+                onlineUsers = Math.max(1, onlineUsers + (Math.random() < 0.5 ? -1 : 1));
+                document.getElementById('onlineCount').textContent = onlineUsers;
+            }, 15000);
+        }
+
+        // Weather widget
+        function updateWeather() {
+            var weathers = [
+                {icon: '☀️', text: '晴れ 25°C'},
+                {icon: '⛅', text: '曇り 22°C'},
+                {icon: '🌧️', text: '雨 18°C'},
+                {icon: '❄️', text: '雪 -2°C'},
+                {icon: '🌩️', text: '雷雨 20°C'}
+            ];
+            
+            setInterval(function() {
+                var weather = weathers[Math.floor(Math.random() * weathers.length)];
+                document.getElementById('weatherIcon').textContent = weather.icon;
+                document.getElementById('weatherText').textContent = weather.text;
+            }, 30000);
+        }
+
+        // Enhanced stats
+        function updateStats() {
+            setInterval(function() {
+                var stats = {
+                    totalViews: parseInt(document.getElementById('totalViews').textContent.replace(',', '')),
+                    thisMonth: parseInt(document.getElementById('thisMonth').textContent.replace(',', '')),
+                    devHours: parseInt(document.getElementById('devHours').textContent.replace(',', ''))
+                };
+                
+                stats.totalViews += Math.floor(Math.random() * 10) + 1;
+                stats.thisMonth += Math.floor(Math.random() * 3) + 1;
+                
+                document.getElementById('totalViews').textContent = stats.totalViews.toLocaleString();
+                document.getElementById('thisMonth').textContent = stats.thisMonth.toLocaleString();
+            }, 20000);
+        }
+
+        // Live updates simulation
+        function startLiveUpdates() {
+            var updateMessages = [
+                '新しい訪問者がサイトを閲覧中...',
+                'FantasyConnect2の開発が進行中...',
+                '新しいVRワールドを構想中...',
+                'メタバース技術を研究中...',
+                'Unity新機能をテスト中...'
+            ];
+            
+            setInterval(function() {
+                var message = updateMessages[Math.floor(Math.random() * updateMessages.length)];
+                console.log('🔄 ' + message);
+                
+                // Simulate guestbook update
+                if (Math.random() < 0.1) {
+                    showNotification('新しい書き込みがありました！');
+                }
+            }, 25000);
+        }
+
+        // Notification system
+        function showNotification(message) {
+            var notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50px;
+                right: 20px;
+                background: linear-gradient(to bottom, #003366, #001122);
+                border: 2px ridge #666699;
+                color: #ffffff;
+                padding: 10px 15px;
+                font-size: 11px;
+                z-index: 10000;
+                border-radius: 0;
+                max-width: 200px;
+                box-shadow: 0 0 10px rgba(102, 204, 255, 0.5);
+            `;
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(function() {
+                if (notification.parentNode) {
+                    notification.style.opacity = '0';
+                    setTimeout(function() {
+                        notification.parentNode.removeChild(notification);
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Enhanced guestbook functions
+        function showAdvancedGuestbookForm() {
+            var form = `
+                <div style="margin: 10px 0;">
+                    <div style="margin: 5px 0;">
+                        <label style="color: #66ccff; font-size: 11px;">お名前:</label><br>
+                        <input type="text" id="guestName" style="width: 200px; padding: 3px; background: #001122; border: 1px inset #666699; color: #ffffff;">
+                    </div>
+                    <div style="margin: 5px 0;">
+                        <label style="color: #66ccff; font-size: 11px;">メールアドレス (任意):</label><br>
+                        <input type="email" id="guestEmail" style="width: 200px; padding: 3px; background: #001122; border: 1px inset #666699; color: #ffffff;">
+                    </div>
+                    <div style="margin: 5px 0;">
+                        <label style="color: #66ccff; font-size: 11px;">メッセージ:</label><br>
+                        <textarea id="guestMessage" rows="4" style="width: 250px; padding: 3px; background: #001122; border: 1px inset #666699; color: #ffffff; resize: none;"></textarea>
+                    </div>
+                    <div style="margin: 10px 0;">
+                        <button onclick="submitGuestEntry()" style="background: #003366; border: 1px outset #666699; color: #ffffff; padding: 5px 10px; margin-right: 5px;">投稿</button>
+                        <button onclick="closeGuestForm()" style="background: #cc0000; border: 1px outset #666699; color: #ffffff; padding: 5px 10px;">キャンセル</button>
+                    </div>
+                </div>
+            `;
+            
+            showModal('ゲストブック投稿', form);
+        }
+
+        function showModal(title, content) {
+            var modal = document.createElement('div');
+            modal.id = 'tempModal';
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #000011; border: 3px ridge #666699; padding: 20px; max-width: 400px; width: 90%;">
+                    <div style="color: #ffcc00; font-weight: bold; margin-bottom: 15px; text-align: center;">${title}</div>
+                    ${content}
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function closeGuestForm() {
+            var modal = document.getElementById('tempModal');
+            if (modal) {
+                modal.parentNode.removeChild(modal);
+            }
+        }
+
+        function submitGuestEntry() {
+            var name = document.getElementById('guestName').value;
+            var message = document.getElementById('guestMessage').value;
+            
+            if (name && message) {
+                showNotification('投稿ありがとうございました！\n管理人確認後に掲載されます。');
+                closeGuestForm();
+            } else {
+                alert('お名前とメッセージを入力してください。');
+            }
+        }
+
+        function showGuestbookLog() {
+            var logContent = `
+                <div style="max-height: 300px; overflow-y: auto; font-size: 11px;">
+                    <div style="margin: 5px 0; padding: 5px; border: 1px solid #666699;">
+                        <div style="color: #66ccff;">プログラマー見習い (2024/09/01)</div>
+                        <div>OpenGLのサンプルコードありがたいです！</div>
+                    </div>
+                    <div style="margin: 5px 0; padding: 5px; border: 1px solid #666699;">
+                        <div style="color: #66ccff;">VR初心者 (2024/08/28)</div>
+                        <div>VRChatワールド制作の参考になります</div>
+                    </div>
+                    <div style="margin: 5px 0; padding: 5px; border: 1px solid #666699;">
+                        <div style="color: #66ccff;">ゲーム好き学生 (2024/08/25)</div>
+                        <div>FantasyConnectの操作性が素晴らしいです</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button onclick="closeGuestForm()" style="background: #003366; border: 1px outset #666699; color: #ffffff; padding: 5px 10px;">閉じる</button>
+                </div>
+            `;
+            showModal('過去ログ', logContent);
+        }
+
+        function showGuestbookRules() {
+            var rules = `
+                <div style="font-size: 11px; line-height: 1.4;">
+                    <div style="color: #66ccff; font-weight: bold; margin-bottom: 10px;">利用規約</div>
+                    <div style="margin: 5px 0;">• 他人を不快にさせる内容は禁止</div>
+                    <div style="margin: 5px 0;">• 商用利用・宣伝目的の投稿禁止</div>
+                    <div style="margin: 5px 0;">• 個人情報の投稿は控えてください</div>
+                    <div style="margin: 5px 0;">• 著作権を侵害する内容は禁止</div>
+                    <div style="margin: 5px 0;">• 管理人の判断で削除する場合があります</div>
+                    <div style="color: #ffcc00; margin-top: 10px;">みんなで楽しいサイトにしましょう♪</div>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button onclick="closeGuestForm()" style="background: #003366; border: 1px outset #666699; color: #ffffff; padding: 5px 10px;">了解</button>
+                </div>
+            `;
+            showModal('利用規約', rules);
+        }
+
+        // Original functions enhanced
+        function closeWelcome() {
+            document.getElementById('welcomePopup').style.display = 'none';
+            initSnowfall();
+            initEnhancedFeatures();
+        }
+
+        // Auto-close welcome after 4 seconds
+        setTimeout(function() {
+            var popup = document.getElementById('welcomePopup');
+            if (popup && popup.style.display !== 'none') {
+                closeWelcome();
+            }
+        }, 4000);
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved theme
+            var savedTheme = localStorage.getItem('abubu_theme') || 'classic';
+            if (savedTheme !== 'classic') {
+                setTimeout(function() {
+                    var themeBtn = document.querySelector(`[onclick="setTheme('${savedTheme}')"]`);
+                    if (themeBtn) themeBtn.click();
+                }, 1000);
+            }
+        });
+
+        // Enhanced video controls
+        function changeVideo(direction) {
+            var video = document.getElementById('heroVideo');
+            currentVideoIndex = (currentVideoIndex + direction + videoSources.length) % videoSources.length;
+            video.style.opacity = '0.5';
+            setTimeout(function() {
+                video.src = videoSources[currentVideoIndex];
+                video.load();
+                video.play().catch(function() {});
+                video.style.opacity = '1';
+            }, 200);
+        }
+
+        // Modal functions (keeping existing ones)
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Enhanced construction alert
+        function showConstructionAlert() {
+            showNotification('🚧 只今工事中です 🚧<br>近日公開予定！');
+        }
+
+        // Snow effect (enhanced)
+        function initSnowfall() {
+            var snowContainer = document.getElementById('snowContainer');
+            var snowflakes = ['❄', '❅', '❆', '✦', '✧', '*', '·'];
+            
+            setInterval(function() {
+                if (document.querySelectorAll('.snowflake').length < 30) {
+                    var snowflake = document.createElement('div');
+                    snowflake.className = 'snowflake';
+                    snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                    snowflake.style.left = Math.random() * 100 + '%';
+                    snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    snowflake.style.opacity = Math.random() * 0.8 + 0.2;
+                    snowflake.style.fontSize = (Math.random() * 8 + 10) + 'px';
+                    snowContainer.appendChild(snowflake);
+                    
+                    setTimeout(function() {
+                        if (snowflake.parentNode) {
+                            snowflake.parentNode.removeChild(snowflake);
+                        }
+                    }, 8000);
+                }
+            }, 500);
+        }
+
+        // BGM toggle
+        function toggleBGM() {
+            bgmEnabled = !bgmEnabled;
+            var notice = document.getElementById('bgmNotice');
+            if (bgmEnabled) {
+                notice.innerHTML = '<div style="font-size: 11px;">♪ BGM: ON (MIDI)</div><button class="mini-button" onclick="toggleBGM()">BGM ON/OFF</button>';
+                showNotification('♪ 懐かしのMIDI音楽モード ON ♪');
+            } else {
+                notice.innerHTML = '<div style="font-size: 11px;">♪ BGM: OFF</div><button class="mini-button" onclick="toggleBGM()">BGM ON/OFF</button>';
+            }
+        }
+
+        // Keyboard shortcuts and other event listeners
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                showModal('ショートカットキー', `
+                    <div style="font-size: 11px;">
+                        <div>Ctrl+H: このヘルプ</div>
+                        <div>Ctrl+B: ブックマーク推奨</div>
+                        <div>Ctrl+F: サイト内検索にフォーカス</div>
+                        <div>F11: 全画面表示</div>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button onclick="closeGuestForm()" class="retro-button">閉じる</button>
+                    </div>
+                `);
+            }
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchBox').focus();
+            }
+        });
+
+        // Enhanced event delegation
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.retro-button, .social-button')) {
+                console.log('♪ ピッ！');
+            }
+            if (e.target.matches('.project-image')) {
+                console.log('♪ カチッ！');
+            }
+        });
+
+        // Right-click protection
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.matches('img, video')) {
+                e.preventDefault();
+                showNotification('右クリックは禁止されています！<br>画像の無断転載はご遠慮ください');
+                return false;
+            }
+        });
+
+        // Navigation
+        var navLinks = document.getElementsByClassName('nav-link');
+        for (var i = 0; i < navLinks.length; i++) {
+            navLinks[i].onclick = function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href').substring(1);
+                smoothScroll(targetId);
+            };
+        }
+
+        function smoothScroll(target) {
+            var element = document.getElementById(target);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Modal close on outside click
+        window.onclick = function(event) {
+            var modals = document.getElementsByClassName('modal');
+            for (var i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        };
+
+        // Video controls
+        document.getElementById('prevVideo').onclick = function() { changeVideo(-1); };
+        document.getElementById('nextVideo').onclick = function() { changeVideo(1); };
+
+        // Enhanced special counter check
+        function checkSpecialCounter() {
+            var counter = parseInt(document.getElementById('counterDigits').textContent);
+            if (counter % 1000 == 0) {
+                setTimeout(function() {
+                    showNotification('★★★ キリ番 ' + counter + ' GET！ ★★★<br>おめでとうございます！');
+                }, 500);
+            } else if (counter % 777 == 0 || counter % 888 == 0) {
+                setTimeout(function() {
+                    showNotification('★ ゾロ目 ' + counter + ' GET！ ★<br>ラッキー！');
+                }, 500);
+            }
+        }
+
+        // Console welcome message
+        console.log('===========================================');
+        console.log('★ Abubu\'s Enhanced Retro Portfolio v3.0 ★');
+        console.log('   Powered by HTML4.01 & Enhanced JS      ');
+        console.log('     (C)2024 All Rights Reserved          ');
+        console.log('===========================================');
+        console.log('🎮 便利機能: 検索、テーマ切替、統計表示等');
+        console.log('🎯 リアルタイム更新対応');
+        console.log('📱 レスポンシブ対応（レトロ風味）');
+        console.log('===========================================');
+    </script>
+</body>
+</html>    <script>
+        // Classic JavaScript for retro feel
+        var videoSources = [
+            "video/FantasyConnectMove.mp4",
+            "video/ファンタジーコネクトTL.mp4"
+        ];
+        var currentVideoIndex = 0;
+        var bgmEnabled = false;
+        var counterValue = 1337;
+
+        // Welcome popup
+        function closeWelcome() {
+            document.getElementById('welcomePopup').style.display = 'none';
+            initSnowfall();
+            updateCounter();
+        }
+
+        // Auto-close welcome after 3 seconds
+        setTimeout(function() {
+            var popup = document.getElementById('welcomePopup');
+            if (popup && popup.style.display !== 'none') {
+                closeWelcome();
+            }
+        }, 3000);
+
+        // Counter animation
+        function updateCounter() {
+            setInterval(function() {
+                counterValue += Math.floor(Math.random() * 3) + 1;
+                document.getElementById('counterDigits').textContent = String(counterValue).padStart(6, '0');
+            }, 10000);
+        }
+
+        // Snow effect
+        function initSnowfall() {
+            var snowContainer = document.getElementById('snowContainer');
+            var snowflakes = ['❄', '❅', '❆', '✦', '✧', '*'];
+            
+            setInterval(function() {
+                if (document.querySelectorAll('.snowflake').length < 50) {
+                    var snowflake = document.createElement('div');
+                    snowflake.className = 'snowflake';
+                    snowflake.innerHTML = snowflakes[Math.floor(Math.random() * snowflakes.length)];
+                    snowflake.style.left = Math.random() * 100 + '%';
+                    snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    snowflake.style.opacity = Math.random();
+                    snowContainer.appendChild(snowflake);
+                    
+                    setTimeout(function() {
+                        if (snowflake.parentNode) {
+                            snowflake.parentNode.removeChild(snowflake);
+                        }
+                    }, 5000);
+                }
+            }, 300);
+        }
+
+        // BGM toggle
+        function toggleBGM() {
+            bgmEnabled = !bgmEnabled;
+            var notice = document.getElementById('bgmNotice');
+            if (bgmEnabled) {
+                notice.innerHTML = '<div style="font-size: 11px;">♪ BGM: ON (MIDI)</div><button class="mini-button" onclick="toggleBGM()">BGM ON/OFF</button>';
+                // 実際のBGMは追加できませんが、雰囲気を演出
+                alert('♪ 懐かしのMIDI音楽が流れました ♪\n（実際の音楽再生機能は未実装です）');
+            } else {
+                notice.innerHTML = '<div style="font-size: 11px;">♪ BGM: OFF</div><button class="mini-button" onclick="toggleBGM()">BGM ON/OFF</button>';
+            }
+        }
+
+        // Video controls
+        function changeVideo(direction) {
+            var video = document.getElementById('heroVideo');
+            currentVideoIndex = (currentVideoIndex + direction + videoSources.length) % videoSources.length;
+            video.style.opacity = '0.5';
+            setTimeout(function() {
+                video.src = videoSources[currentVideoIndex];
+                video.load();
+                video.play().catch(function() {});
+                video.style.opacity = '1';
+            }, 200);
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            // Play classic "ding" sound effect (simulated)
+            console.log('♪ チーン！');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Construction alert
+        function showConstructionAlert() {
+            alert('🚧 只今工事中です 🚧\n\nしばらくお待ちください。\n近日公開予定！\n\n管理人より');
+        }
+
+        // Guestbook form
+        function showGuestbookForm() {
+            var name = prompt('お名前を入力してください：', 'ゲスト');
+            if (name) {
+                var message = prompt('メッセージをどうぞ：', '');
+                if (message) {
+                    alert('✉ 書き込みありがとうございました！\n\n' + name + 'さんのメッセージ：\n' + message + '\n\n管理人が確認後、掲載いたします♪');
+                }
+            }
+        }
+
+        // Right-click protection (classic feature)
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.matches('img, video')) {
+                e.preventDefault();
+                var msg = document.getElementById('protectionMsg');
+                msg.style.display = 'block';
+                setTimeout(function() {
+                    msg.style.display = 'none';
+                }, 2000);
+                return false;
+            }
+        });
+
+        // Status bar message (classic feature)
+        var statusMessages = [
+            'ようこそAbubuのポートフォリオへ！',
+            '★ゲーム制作に情熱を注いでいます★',
+            'VRの世界で新しい体験を創造中...',
+            'Unity + 創造力 = 無限の可能性',
+            'メタバースの未来を一緒に築きましょう！'
+        ];
+        var messageIndex = 0;
+
+        setInterval(function() {
+            if (window.status !== undefined) {
+                window.status = statusMessages[messageIndex];
+                messageIndex = (messageIndex + 1) % statusMessages.length;
+            }
+        }, 3000);
+
+        // Event listeners
+        document.getElementById('prevVideo').onclick = function() { changeVideo(-1); };
+        document.getElementById('nextVideo').onclick = function() { changeVideo(1); };
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            var modals = document.getElementsByClassName('modal');
+            for (var i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        };
+
+        // Classic smooth scrolling
+        function smoothScroll(target) {
+            var element = document.getElementById(target);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Navigation links
+        var navLinks = document.getElementsByClassName('nav-link');
+        for (var i = 0; i < navLinks.length; i++) {
+            navLinks[i].onclick = function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href').substring(1);
+                smoothScroll(targetId);
+            };
+        }
+
+        // Random visitor message
+        var visitorMessages = [
+            'いらっしゃいませ〜♪',
+            'ごゆっくりどうぞ！',
+            'お疲れさまです！',
+            'お越しいただきありがとうございます',
+            '今日も良い一日を〜'
+        ];
+
+        // Show random message on page load
+        setTimeout(function() {
+            var randomMsg = visitorMessages[Math.floor(Math.random() * visitorMessages.length)];
+            console.log('★ ' + randomMsg + ' ★');
+        }, 1000);
+
+        // Keyboard shortcuts (classic feature)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                alert('ショートカットキー一覧：\n\nCtrl+H: このヘルプ\nCtrl+B: ブックマークに追加\nF11: 全画面表示\n\n※ブラウザの設定により動作しない場合があります');
+            }
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                alert('お気に入りに追加してくださいね♪\n\n（手動でブックマークに追加してください）');
+            }
+        });
+
+        // Page view tracking (simulated)
+        var pageViews = localStorage.getItem('abubu_page_views') || 0;
+        pageViews++;
+        localStorage.setItem('abubu_page_views', pageViews);
+        
+        if (pageViews == 1) {
+            setTimeout(function() {
+                alert('初回訪問ありがとうございます！\n\nこのサイトはネットスケープ4.0、IE5.0以上で最適化されています。\nJavaScriptをONにしてお楽しみください♪');
+            }, 2000);
+        } else if (pageViews % 100 == 0) {
+            setTimeout(function() {
+                alert('★記念すべき' + pageViews + '回目の訪問です★\n\nいつもありがとうございます！\n今後ともよろしくお願いします m(_ _)m');
+            }, 1500);
+        }
+
+        // Hit counter with special numbers
+        function checkSpecialCounter() {
+            var counter = parseInt(document.getElementById('counterDigits').textContent);
+            if (counter % 1000 == 0) {
+                setTimeout(function() {
+                    alert('★★★ キリ番GET！ ★★★\n\n' + counter + '番踏みおめでとうございます！\nゲストブックにコメントをお願いします♪');
+                }, 500);
+            } else if (counter % 777 == 0 || counter % 888 == 0) {
+                setTimeout(function() {
+                    alert('★ ゾロ目GET！ ★\n\n' + counter + '番踏みおめでとうございます！\nラッキーナンバーですね♪');
+                }, 500);
+            }
+        }
+
+        // Enhanced counter with special number check
+        function updateCounterWithSpecial() {
+            setInterval(function() {
+                var oldValue = counterValue;
+                counterValue += Math.floor(Math.random() * 3) + 1;
+                document.getElementById('counterDigits').textContent = String(counterValue).padStart(6, '0');
+                
+                // Check for special numbers
+                if (counterValue != oldValue) {
+                    checkSpecialCounter();
+                }
+            }, 15000);
+        }
+
+        // Replace the old updateCounter call
+        function initializeCounter() {
+            updateCounterWithSpecial();
+        }
+
+        // Last update time display
+        function showLastUpdate() {
+            var updateTime = new Date();
+            var timeString = updateTime.getFullYear() + '/' + 
+                           String(updateTime.getMonth() + 1).padStart(2, '0') + '/' + 
+                           String(updateTime.getDate()).padStart(2, '0') + ' ' +
+                           String(updateTime.getHours()).padStart(2, '0') + ':' + 
+                           String(updateTime.getMinutes()).padStart(2, '0');
+            
+            console.log('最終更新: ' + timeString);
+        }
+
+        // Initialize everything
+        showLastUpdate();
+        
+        // Classic "loading..." effect
+        window.addEventListener('load', function() {
+            console.log('★ページの読み込みが完了しました★');
+            setTimeout(function() {
+                if (document.getElementById('welcomePopup').style.display !== 'none') {
+                    console.log('自動でウェルカムポップアップを閉じます...');
+                }
+            }, 4000);
+        });
+
+        // Add some retro sound effects (console messages)
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.retro-button, .social-button')) {
+                console.log('♪ ピッ！');
+            }
+            if (e.target.matches('.project-image')) {
+                console.log('♪ カチッ！');
+            }
+        });
+
+        // Web ring simulation (classic feature)
+        function showWebRing() {
+            var webRingSites = [
+                'ゲーム制作者の輪',
+                'Unity開発者サークル', 
+                'VRクリエイター同盟',
+                'インディーゲーム制作者リング',
+                'メタバース開発者の集い'
+            ];
+            var randomSite = webRingSites[Math.floor(Math.random() * webRingSites.length)];
+            alert('ウェブリング「' + randomSite + '」\n\n[ << 前 ] [ 次 >> ] [ ランダム ] [ 一覧 ]\n\n※これはデモです');
+        }
+
+        console.log('=================================');
+        console.log('★ Abubu\'s Retro Portfolio v2.0 ★');
+        console.log('    Powered by HTML4.01 & JS    ');
+        console.log('     (C)2024 All Rights Reserved');
+        console.log('=================================');
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abubu Portfolio - Game Developer & Metaverse Creator</title>
+    <meta name="description" content="専門学校穴吹デザインカレッジ（Abubu）のゲーム開発・メタバース制作ポートフォリオ">
+    
+    <style>
+        /* Early 2000s Nostalgic Design */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Times New Roman", serif;
+            background: linear-gradient(45deg, #001122 0%, #003366 50%, #001122 100%);
+            color: #ffffff;
+            line-height: 1.4;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+
+        /* Classic animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: starField 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes starField {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-60px); }
+        }
+
+        /* Classic table-based layout container */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #000011;
+            border: 3px ridge #666699;
+            box-shadow: 0 0 20px #000066;
+        }
+
+        /* Header with classic styling */
+        .header {
+            background: linear-gradient(to bottom, #003366, #001122);
+            border-bottom: 2px solid #666699;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★ ☆ ★';
+            position: absolute;
+            top: 5px;
+            left: 0;
+            right: 0;
+            font-size: 12px;
+            color: #ffcc00;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #ffcc00;
+            text-shadow: 2px 2px 4px #000000;
+            margin: 15px 0 10px 0;
+            font-family: "Impact", sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #66ccff;
+            margin: 5px 0;
+            font-style: italic;
+        }
+
+        .tagline {
+            background: #001122;
+            border: 1px solid #666699;
+            padding: 8px;
+            margin: 15px auto;
+            width: fit-content;
+            font-size: 12px;
+            color: #cccccc;
+            border-radius: 0;
+        }
+
+        /* Classic navigation bar */
+        .navbar {
+            background: #001122;
+            border-bottom: 2px solid #666699;
+            padding: 0;
+            text-align: center;
+        }
+
+        .nav-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .nav-cell {
+            border-right: 1px solid #666699;
+            background: linear-gradient(to bottom, #003366, #001122);
+            padding: 12px 8px;
+        }
+
+        .nav-cell:last-child {
+            border-right: none;
+        }
+
+        .nav-cell:hover {
+            background: linear-gradient(to bottom, #004488, #002244);
+        }
+
+        .nav-link {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-link:hover {
+            color: #ffcc00;
+        }
+
+        /* Main content area */
+        .main-content {
+            padding: 20px;
+            background: #000011;
+        }
+
+        /* Video showcase with classic styling */
+        .video-showcase {
+            border: 3px ridge #666699;
+            margin: 20px 0;
+            background: #001122;
+            padding: 10px;
+        }
+
+        .video-showcase video {
+            width: 100%;
+            border: 2px inset #666699;
+        }
+
+        .video-controls {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .video-btn {
+            background: linear-gradient(to bottom, #003366, #001122);
+            border: 2px outset #666699;
+            color: #ffffff;
+            padding: 5px 15px;
+            margin: 0 10px;
+            cursor: pointer;
+            font-family: "MS Sans Serif", sans-serif;
+            font-size: 12px;
+        }
+
+        .video-btn:hover {
+            background: linear-gradient(to bottom, #004488, #002244);
+        }
+
+        .video-btn:active {
+            border: 2px inset #666699;
+        }
+
+        /* Section headers */
+        .section-header {
+            text-align: center;
+            margin: 30px 0 20px 0;
+            padding: 15px;
+            background: linear-gradient(to right, #001122, #003366, #001122);
+            border: 2px ridge #666699;
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: #ffcc00;
+            text-shadow: 2px 2px 4px #000000;
+            font-family: "Impact", sans-serif;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .section-description {
+            font-size: 14px;
+            color: #cccccc;
+            font-style: italic;
+        }
+
+        /* Classic table layout for projects */
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .project-row {
+            border-bottom: 1px solid #666699;
+        }
+
+        .project-cell {
+            padding: 15px;
+            vertical-align: top;
+            border: 1px solid #666699;
+            background: linear-gradient(to bottom, #001122, #000011);
+        }
+
+        .project-image {
+            width: 150px;
+            height: 100px;
+            object-fit: cover;
+            border: 2px inset #666699;
+            float: left;
+            margin-right: 15px;
+            margin-bottom: 10px;
+        }
+
+        .project-title {
+            font-size: 16px;
+            color: #66ccff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-decoration: underline;
+        }
+
+        .project-description {
+            font-size: 12px;
+            color: #cccccc;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .project-tags {
+            font-size: 11px;
+            color: #ffcc00;
+        }
+
+        .project-tag {
+            background: #003366;
+            border: 1px solid #666699;
+            padding: 2px 6px;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        /* Special video section */
+        .metaverse-section {
+            border: 3px double #666699;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, #001122, #000011);
+        }
+
+        .metaverse-video {
+            width: 100%;
+            border: 2px inset #666699;
+            margin: 15px 0;
+        }
+
+        /* Platform links with classic button styling */
+        .platform-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .platform-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .platform-cell {
+            border: 1px solid #666699;
+            padding: 15px;
+            text-align: center;
+            background: linear-gradient(to bottom, #001122, #000011);
+            width: 25%;
+        }
+
+        .platform-cell:hover {
+            background: linear-gradient(to bottom, #003366, #001122);
+        }
+
+        .platform-link {
+            color: #66ccff;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+        }
+
+        .platform-link:hover {
+            color: #ffcc00;
+            text-decoration: underline;
+        }
+
+        .platform-image {
+            width: 100px;
+            height: 60px;
+            object-fit: cover;
+            border: 1px solid #666699;
+            margin-bottom: 8px;
+        }
+
+        /* Footer with classic styling */
+        .footer {
+            background: linear-gradient(to bottom, #003366, #001122);
+            border-top: 2px solid #666699;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '✦ ◊ ❖ ◊ ✦ ◊ ❖ ◊ ✦ ◊ ❖ ◊ ✦ ◊ ❖ ◊ ✦';
+            position: absolute;
+            top: 5px;
+            left: 0;
+            right: 0;
+            font-size: 10px;
+            color: #666699;
+        }
+
+        .social-button {
+            background: linear-gradient(to bottom, #003366, #001122);
+            border: 2px outset #666699;
+            color: #ffffff;
+            padding: 8px 16px;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .social-button:hover {
+            background: linear-gradient(to bottom, #004488, #002244);
+            color: #ffcc00;
+        }
+
+        .social-button:active {
+            border: 2px inset #666699;
+        }
+
+        /* Modal with classic window styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        .modal-window {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            background: #000011;
+            border: 3px ridge #666699;
+            box-shadow: 5px 5px 15px #000000;
+        }
+
+        .modal-titlebar {
+            background: linear-gradient(to right, #003366, #001122);
+            padding: 8px 15px;
+            border-bottom: 1px solid #666699;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .modal-close {
+            background: #cc0000;
+            border: 1px outset #ff6666;
+            color: #ffffff;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-close:hover {
+            background: #ff0000;
+        }
+
+        .modal-content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-image {
+            width: 100%;
+            border: 2px inset #666699;
+            margin: 10px 0;
+        }
+
+        /* Classic scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 16px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #001122;
+            border: 1px inset #666699;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #003366, #001122);
+            border: 1px outset #666699;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #004488, #002244);
+        }
+
+        /* Visitor counter style */
+        .visitor-counter {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: #000011;
+            border: 2px ridge #666699;
+            padding: 5px 10px;
+            font-size: 11px;
+            color: #66ccff;
+            z-index: 100;
+        }
+
+        /* Blinking text animation */
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Under construction GIF replacement */
+        .construction {
+            display: inline-block;
+            color: #ffcc00;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        /* Classic marquee replacement */
+        .news-ticker {
+            background: #001122;
+            border: 1px solid #666699;
+            padding: 5px;
+            margin: 10px 0;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .news-ticker span {
+            display: inline-block;
+            animation: scroll-left 15s linear infinite;
+            color: #66ccff;
+            font-size: 12px;
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Responsive adjustments for the retro design */
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                border: none;
+            }
+            
+            .nav-table {
+                display: block;
+            }
+            
+            .nav-cell {
+                display: block;
+                border-bottom: 1px solid #666699;
+                border-right: none;
+            }
+            
+            .project-image {
+                width: 100px;
+                height: 70px;
+            }
+            
+            .platform-cell {
+                display: block;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Visitor Counter -->
+    <div class="visitor-counter">
+        訪問者数: <span class="blink">001337</span>
+    </div>
+
+    <div class="container">
+        <!-- Classic Header -->
+        <div class="header">
+            <h1>ポートフォリオ</h1>
+            <div class="subtitle">専門学校穴吹デザインカレッジ (Abubu)</div>
+            <div class="subtitle">Game Developer & XR Engineer</div>
+            <div class="tagline">作品に命を吹き込む、クリエイティブな世界へ</div>
+        </div>
+
+        <!-- Classic Navigation -->
+        <div class="navbar">
+            <table class="nav-table">
+                <tr>
+                    <td class="nav-cell"><a href="#games" class="nav-link">ゲーム作品</a></td>
+                    <td class="nav-cell"><a href="#metaverse" class="nav-link">メタバース</a></td>
+                    <td class="nav-cell"><a href="#vrchat" class="nav-link">VRChat</a></td>
+                    <td class="nav-cell"><a href="#cluster" class="nav-link">Cluster</a></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- News Ticker -->
+        <div class="news-ticker">
+            <span>★ 最新情報: FantasyConnect2 2024年冬発売予定！ ★ デザイン展2024にて最優秀賞受賞！ ★ VRChatワールド公開中 ★</span>
+        </div>
+
+        <div class="main-content">
+            <!-- Hero Video -->
+            <div class="video-showcase">
+                <video id="heroVideo" controls autoplay muted loop preload="metadata">
+                    <source src="video/FantasyConnectMove.mp4" type="video/mp4">
+                    お使いのブラウザは動画タグをサポートしていません。
+                </video>
+                <div class="video-controls">
+                    <button class="video-btn" id="prevVideo">◀ 前の動画</button>
+                    <button class="video-btn" id="nextVideo">次の動画 ▶</button>
+                </div>
+            </div>
+
+            <!-- Games Section -->
+            <div id="games">
+                <div class="section-header">
+                    <div class="section-title">ゲーム作品</div>
+                    <div class="section-description">主な作品集</div>
+                </div>
+
+                <table class="projects-table">
+                    <tr class="project-row">
+                        <td class="project-cell">
+                            <img src="image/FantasyConnectTitle.png" alt="FantasyConnect" class="modal-image">
+                <img src="image/FantasyConnect (1).png" alt="FantasyConnect 2" class="modal-image">
+                <img src="image/FantasyConnect (2).png" alt="FantasyConnect 3" class="modal-image">
+                <img src="image/FantasyConnect (3).png" alt="FantasyConnect 4" class="modal-image">
+                <img src="image/FantasyConnect (4).png" alt="FantasyConnect 5" class="modal-image">
+                <div class="project-description">
+                    ファンタジーな世界観のアクションゲームを作りたいと思い作成した作品になります。今作ではプレイヤーが世界観を楽しめるように制作しており、一部NPCと会話できるようにしたり、ボス戦時にUnityの機能のタイムラインを使用した演出などを作成したりしております。また、プレイヤーは複数の武器を装備したり、動物に乗って移動を行うことが出来、戦闘や探索を楽しめるようにしており、戦闘面でもSEやエフェクト、ヒットストップなどを導入しているため、敵を撃破した際の、爽快感も味わえるようにしております。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="monsterHunters" class="modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <div class="modal-title">Monster Hunters - 詳細情報</div>
+                <button class="modal-close" onclick="closeModal('monsterHunters')">×</button>
+            </div>
+            <div class="modal-content">
+                <img src="image/MonsterHunters (1).png" alt="Monster Hunters 1" class="modal-image">
+                <img src="image/MonsterHunters (2).png" alt="Monster Hunters 2" class="modal-image">
+                <img src="image/MonsterHunters (3).png" alt="Monster Hunters 3" class="modal-image">
+                <img src="image/MonsterHunters (4).png" alt="Monster Hunters 4" class="modal-image">
+                <img src="image/MonsterHunters (5).png" alt="Monster Hunters 5" class="modal-image">
+                <img src="image/MonsterHunters (6).png" alt="Monster Hunters 6" class="modal-image">
+                <div class="project-description">
+                    初めてMonobit Unity Networking 2.0を使用して作成したオンラインシューティングゲーム作品になります。今作では「プレイヤーが自分に合ったキャラクターで戦える」をメインに考えており、プレイヤーキャラは12種類のキャラを導入し、それぞれのキャラが違った戦い方が出来るようにしています。また、敵も近接タイプや魔法攻撃を行ってくる敵などを作成し、少しでも戦闘を飽きにくくしております。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hissho" class="modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <div class="modal-title">必笑～笑いのツボ職人～ - 詳細情報</div>
+                <button class="modal-close" onclick="closeModal('hissho')">×</button>
+            </div>
+            <div class="modal-content">
+                <img src="image/必笑～笑いのツボ職人～  (5).webp" alt="必笑 1" class="modal-image">
+                <img src="image/必笑～笑いのツボ職人～  (4).webp" alt="必笑 2" class="modal-image">
+                <img src="image/必笑～笑いのツボ職人～  (3).webp" alt="必笑 3" class="modal-image">
+                <img src="image/必笑～笑いのツボ職人～  (2).webp" alt="必笑 4" class="modal-image">
+                <img src="image/必笑～笑いのツボ職人～  (1).webp" alt="必笑 5" class="modal-image">
+                <img src="image/必笑～笑いのツボ職人～  (6).webp" alt="必笑 6" class="modal-image">
+                <div class="project-description">
+                    この作品はGlobal Game Jam2024にて個人で開発を行って作成しており、Monobit Unity Networking 2.0を使用して作成したオンラインゲームとなっております。ゲームのコンセプトは「クリックの操作だけで遊べるゲーム」となっており、ゲームの敵をマウスでクリックして攻撃を行ったり交わしたりできるようになっていて、ゲームが苦手な人でも操作しやすいように作っております。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sanbuta" class="modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <div class="modal-title">さんぶたレーシング - 詳細情報</div>
+                <button class="modal-close" onclick="closeModal('sanbuta')">×</button>
+            </div>
+            <div class="modal-content">
+                <img src="image/さんぶたレーシング (3).png" alt="さんぶたレーシング 1" class="modal-image">
+                <img src="image/さんぶたレーシング (4).png" alt="さんぶたレーシング 2" class="modal-image">
+                <img src="image/さんぶたレーシング (1).png" alt="さんぶたレーシング 3" class="modal-image">
+                <img src="image/さんぶたレーシング (5).png" alt="さんぶたレーシング 4" class="modal-image">
+                <img src="image/さんぶたレーシング (6).png" alt="さんぶたレーシング 5" class="modal-image">
+                <img src="image/さんぶたレーシング (2).png" alt="さんぶたレーシング 6" class="modal-image">
+                <div class="project-description">
+                    香川県の商店街で行われたお店とコラボした商店街ゲームジャムで、お店と商店街をテーマにしたゲーム開発を行いました。このゲームでは様々な人の企画を取り入れ商店街では普段できないレースを、ゲーム内で出来たら面白いと考え、作成しました。チーム開発で、私は主に敵の動きやその他一部アイテムや処理の修正、マップイラストやマップギミックの作成などを担当しました。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="inokori" class="modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <div class="modal-title">居残授業 - 詳細情報</div>
+                <button class="modal-close" onclick="closeModal('inokori')">×</button>
+            </div>
+            <div class="modal-content">
+                <img src="image/居残授業 (2).png" alt="居残授業 1" class="modal-image">
+                <img src="image/居残授業 (1).png" alt="居残授業 2" class="modal-image">
+                <img src="image/居残授業 (3).png" alt="居残授業 3" class="modal-image">
+                <img src="image/居残授業 (4).png" alt="居残授業 4" class="modal-image">
+                <img src="image/居残授業 (5).png" alt="居残授業 5" class="modal-image">
+                <img src="image/居残授業 (6).png" alt="居残授業 6" class="modal-image">
+                <img src="image/居残授業 (7).png" alt="居残授業 7" class="modal-image">
+                <div class="project-description">
+                    1年次の学校の授業で作成したOpenGLを使用したC++のチーム作品になります。自身はプログラムの部分を担当し、プレイヤーの動きやアニメーションの制御、マップチップの配置やシーン切り替え、HP等の部分を主に作成しました。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fantasyConnect2" class="modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <div class="modal-title">ファンタジーコネクト 2 - 詳細情報</div>
+                <button class="modal-close" onclick="closeModal('fantasyConnect2')">×</button>
+            </div>
+            <div class="modal-content">
+                <img src="image/ファンタジーコネクト2 (1).png" alt="ファンタジーコネクト2 1" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (2).png" alt="ファンタジーコネクト2 2" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (3).png" alt="ファンタジーコネクト2 3" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (4).png" alt="ファンタジーコネクト2 4" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (5).png" alt="ファンタジーコネクト2 5" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (6).png" alt="ファンタジーコネクト2 6" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (7).png" alt="ファンタジーコネクト2 7" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (8).png" alt="ファンタジーコネクト2 8" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (9).png" alt="ファンタジーコネクト2 9" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (10).png" alt="ファンタジーコネクト2 10" class="modal-image">
+                <img src="image/ファンタジーコネクト2 (11).png" alt="ファンタジーコネクト2 11" class="modal-image">
+                <div class="project-description">
+                    このゲームは、新しいオンラインアクションゲームで、複数のキャラクターを使って異なるプレイスタイルを楽しむことができます。ゲームの開発は約5ヶ月に渡って行われ、多くのフィードバックを元にバランス調整を行いました。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Classic JavaScript for retro feel
+        var videoSources = [
+            "video/FantasyConnectMove.mp4",
+            "video/ファンタジーコネクトTL.mp4"
+        ];
+        var currentVideoIndex = 0;
+
+        function changeVideo(direction) {
+            var video = document.getElementById('heroVideo');
+            currentVideoIndex = (currentVideoIndex + direction + videoSources.length) % videoSources.length;
+            video.src = videoSources[currentVideoIndex];
+            video.load();
+            video.play();
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Classic event listeners
+        document.getElementById('prevVideo').onclick = function() { changeVideo(-1); };
+        document.getElementById('nextVideo').onclick = function() { changeVideo(1); };
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            var modals = document.getElementsByClassName('modal');
+            for (var i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            }
+        };
+
+        // Classic smooth scrolling
+        function smoothScroll(target) {
+            var element = document.getElementById(target);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Add click events to navigation links
+        var navLinks = document.getElementsByClassName('nav-link');
+        for (var i = 0; i < navLinks.length; i++) {
+            navLinks[i].onclick = function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href').substring(1);
+                smoothScroll(targetId);
+            };
+        }
+
+        // Visitor counter animation
+        setInterval(function() {
+            var counter = document.querySelector('.visitor-counter span');
+            var current = parseInt(counter.textContent);
+            counter.textContent = String(current + 1).padStart(6, '0');
+        }, 30000); // Update every 30 seconds
+
+        // Classic alert for interactions
+        console.log('Welcome to Abubu\'s Retro Portfolio! 🎮');
+    </script>
+</body>
+</html> alt="FantasyConnect" class="project-image" onclick="openModal('fantasyConnect')">
+                            <div class="project-title">FantasyConnect</div>
+                            <div class="project-description">
+                                Unityで開発した3Dアクションゲーム。デザイン展2024にて最優秀賞を受賞した、ファンタジー世界を舞台にした冒険作品。
+                            </div>
+                            <div class="project-tags">
+                                <span class="project-tag">Unity</span>
+                                <span class="project-tag">3D Action</span>
+                                <span class="project-tag">2024年1月</span>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr class="project-row">
+                        <td class="project-cell">
+                            <img src="image/MonsterHuntersTitle.png" alt="Monster Hunters" class="project-image" onclick="openModal('monsterHunters')">
+                            <div class="project-title">Monster Hunters</div>
+                            <div class="project-description">
+                                Monobit Unity Networking 2.0を使用したオンラインアクションゲーム。商店街のイベントで多くの人にプレイしていただきました。
+                            </div>
+                            <div class="project-tags">
+                                <span class="project-tag">Unity</span>
+                                <span class="project-tag">マルチプレイ</span>
+                                <span class="project-tag">2024年1月</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="project-row">
+                        <td class="project-cell">
+                            <img src="image/必笑～笑いのツボ職人～  (5).webp" alt="必笑～笑いのツボ職人～" class="project-image" onclick="openModal('hissho')">
+                            <div class="project-title">必笑～笑いのツボ職人～</div>
+                            <div class="project-description">
+                                GlobalGameJam2024で個人制作したオンラインクリックゲーム。2日間で開発し、シンプルな操作で楽しめる作品。
+                            </div>
+                            <div class="project-tags">
+                                <span class="project-tag">GameJam</span>
+                                <span class="project-tag">オンライン</span>
+                                <span class="project-tag">2024年1月</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="project-row">
+                        <td class="project-cell">
+                            <img src="image/さんぶたレーシング (3).png" alt="さんぶたレーシング" class="project-image" onclick="openModal('sanbuta')">
+                            <div class="project-title">さんぶたレーシング</div>
+                            <div class="project-description">
+                                香川県の商店街GameJamでチーム制作したレーシングゲーム。地域の特色を活かした楽しい作品。
+                            </div>
+                            <div class="project-tags">
+                                <span class="project-tag">チーム開発</span>
+                                <span class="project-tag">レースゲーム</span>
+                                <span class="project-tag">2023年10月</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="project-row">
+                        <td class="project-cell">
+                            <img src="image/居残授業 (2).png" alt="居残授業" class="project-image" onclick="openModal('inokori')">
+                            <div class="project-title">居残授業</div>
+                            <div class="project-description">
+                                1年次にOpenGLとC++で開発したチーム作品。プログラミング担当として、基礎から学んだ技術を結集。
+                            </div>
+                            <div class="project-tags">
+                                <span class="project-tag">OpenGL</span>
+                                <span class="project-tag">C++</span>
+                                <span class="project-tag">2023年1月</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr class="project-row">
+                        <td class="project-cell">
+                            <img src="image/ファンタジーコネクト2 (2).png" alt="ファンタジーコネクト2" class="project-image" onclick="openModal('fantasyConnect2')">
+                            <div class="project-title">ファンタジーコネクト 2 <span class="construction">【開発中】</span></div>
+                            <div class="project-description">
+                                2024年冬発売予定の続編。前作を超える新しい世界観と、より洗練されたゲームシステムを実装。
+                            </div>
+                            <div class="project-tags">
+                                <span class="project-tag">Unity</span>
+                                <span class="project-tag">開発中</span>
+                                <span class="project-tag">2024年12月</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Metaverse Section -->
+            <div id="metaverse" class="metaverse-section">
+                <div class="section-header">
+                    <div class="section-title">メタバース</div>
+                    <div class="section-description">メタバース作品集</div>
+                </div>
+                
+                <div class="project-title">善通寺メタバース</div>
+                <video class="metaverse-video" controls autoplay muted loop preload="metadata">
+                    <source src="video/善通寺メタバース.mp4" type="video/mp4">
+                </video>
+                <div class="project-description">
+                    プログラマーと3Dデザイナーの2名で開発、善通寺市をテーマにしたメタバース空間。
+                    地域の魅力を仮想空間で表現し、新しい体験価値を創造しています。
+                </div>
+                <div class="project-tags">
+                    <span class="project-tag">Unity</span>
+                    <span class="project-tag">メタバース</span>
+                    <span class="project-tag">ボイスチャット</span>
+                    <span class="project-tag">2023年4月～</span>
+                </div>
+            </div>
+
+            <!-- VRChat Section -->
+            <div id="vrchat">
+                <div class="section-header">
+                    <div class="section-title">VRchat worlds</div>
+                    <div class="section-description">VRChatで公開している没入型ワールド</div>
+                </div>
+
+                <div class="metaverse-section">
+                    <div class="project-title">NeonCity2024</div>
+                    <video class="metaverse-video" controls autoplay muted loop preload="metadata">
+                        <source src="video/NeonCity.mp4" type="video/mp4">
+                    </video>
+                    <div class="project-description">
+                        初めてVRChatにアップロードしたワールド。ネオンに彩られた未来都市をテーマに、
+                        サイバーパンクな雰囲気を演出しました。
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="https://vrch.at/zc064nm6" target="_blank" class="social-button">ワールドを訪問</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cluster Section -->
+            <div id="cluster">
+                <div class="section-header">
+                    <div class="section-title">Cluster worlds</div>
+                    <div class="section-description">Clusterで展開する多彩なバーチャル空間</div>
+                </div>
+
+                <table class="platform-table">
+                    <tr>
+                        <td class="platform-cell">
+                            <a href="https://cluster.mu/w/2a873311-f00d-4f7d-8962-d87a9f3c874a" target="_blank" class="platform-link">
+                                <img src="image/Cluster (YUME).png" alt="City of Dreams" class="platform-image">
+                                <div>City of Dreams</div>
+                                <div style="font-size: 11px; color: #cccccc;">夢の街をテーマにした幻想的なワールド</div>
+                            </a>
+                        </td>
+                        <td class="platform-cell">
+                            <a href="https://cluster.mu/w/409b4a43-9eb9-4250-959e-0c15fb14383c" target="_blank" class="platform-link">
+                                <img src="image/Cluster (TOKYO).png" alt="Tokyo" class="platform-image">
+                                <div>Tokyo</div>
+                                <div style="font-size: 11px; color: #cccccc;">東京っぽいバーチャル空間</div>
+                            </a>
+                        </td>
+                        <td class="platform-cell">
+                            <a href="https://cluster.mu/w/72b6461e-17b8-476a-92f2-ad02938bba75" target="_blank" class="platform-link">
+                                <img src="image/Cluster (SAKURAMATI).png" alt="桜咲く街" class="platform-image">
+                                <div>桜咲く街</div>
+                                <div style="font-size: 11px; color: #cccccc;">桜が舞う和風ワールド</div>
+                            </a>
+                        </td>
+                        <td class="platform-cell">
+                            <a href="https://cluster.mu/w/4bb17140-1752-409d-90b4-e9e75c7f1d7c" target="_blank" class="platform-link">
+                                <img src="image/Cluster (Horror).jpg" alt="Horror" class="platform-image">
+                                <div>Horror</div>
+                                <div style="font-size: 11px; color: #cccccc;">ホラー風ワールド</div>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div style="margin-top: 20px;">
+                <div style="font-size: 16px; color: #ffcc00; font-weight: bold;">Let's Connect</div>
+                <div style="margin: 10px 0;">ご相談はお気軽に</div>
+                <a href="https://twitter.com/Abu831831" target="_blank" class="social-button">Twitter</a>
+            </div>
+            <div style="margin-top: 20px; font-size: 11px; color: #666699;">
+                © 2024 Abubu Portfolio. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    <!-- Classic Modal Windows -->
+    <div id="fantasyConnect" class="modal">
+        <div class="modal-window">
+            <div class="modal-titlebar">
+                <div class="modal-title">FantasyConnect - 詳細情報</div>
+                <button class="modal-close" onclick="closeModal('fantasyConnect')">×</button>
+            </div>
+            <div class="modal-content">
+                <img src="image/FantasyConnectTitle.png"
